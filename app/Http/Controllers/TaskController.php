@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Traits\HttpResponses;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -12,9 +13,11 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+     use HttpResponses;
     public function index()
     {
-        //
+        return Task::all();
     }
 
     /**
