@@ -13,6 +13,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/request-verification', [AuthController::class, 'verify']);
+Route::get('/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
+
 
 // Protected routes
 Route::group(["middleware"=> ["auth:sanctum"]], function () {

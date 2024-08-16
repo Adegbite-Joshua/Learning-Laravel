@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Resources\TasksResource;
 use App\Models\Task;
 use App\Traits\HttpResponses;
+use Auth;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -17,17 +20,7 @@ class TaskController extends Controller
      use HttpResponses;
     public function index()
     {
-        return Task::all();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return TasksResource::collection(Task::where('user_id', Auth::user()->id)->get());
     }
 
     /**
@@ -36,9 +29,18 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreTaskRequest $request)
     {
-        //
+        $request->validated($request->all());
+
+        $task = Task::create([
+            "user_id"=> Auth::user()->id,
+            "name"=> $request->name,
+            "description"=> $request->description,
+            "priority"=> $request->priority
+        ]);
+
+        return new TasksResource($task);
     }
 
     /**
@@ -49,18 +51,10 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Task  $task
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Task $task)
-    {
-        //
+        if (Auth::user()->id != $task->user_id) {
+            return $this->error("", "You are not authorized to make this request", 403);
+        }
+        return new TasksResource($task);
     }
 
     /**
@@ -72,7 +66,13 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        //
+        if (Auth::user()->id != $task->user_id) {
+            return $this->error("", "You are not authorized to make this request", 403);
+        }
+
+        $task->update($request->all());
+
+        return new TasksResource($task);
     }
 
     /**
@@ -83,6 +83,11 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        if (Auth::user()->id != $task->user_id) {
+            return $this->error("", "You are not authorized to make this request", 403);
+        }
+        $task->delete();
+
+        return response(null, 204);
     }
 }

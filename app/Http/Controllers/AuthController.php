@@ -24,12 +24,16 @@ class AuthController extends Controller
             "password" => Hash::make($request->password),
         ]);
 
+        $user->sendEmailVerificationNotification();
+
         return $this->success([
             "user" => $user,
             "token" => $user->createToken('API Token of' . $user->token)->plainTextToken
         ]);
 
     }
+
+
 
     public function login(LoginUserRequest $request)
     {
@@ -49,5 +53,23 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+         Auth::user()->currentAccessToken()->delete();
+
+         return $this->success([
+            "message"=> "You have successfully been logged out and your token has been deleted"
+         ]);
+    }
+
+    public function verify($id)
+    {
+        $user = User::find($id);
+
+        if (!$user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+        }
+
+        return $this->success([
+            "message"=> "Email verified succesfully"
+        ]);
     }
 }
