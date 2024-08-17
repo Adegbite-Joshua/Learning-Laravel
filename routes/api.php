@@ -13,7 +13,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/request-verification', [AuthController::class, 'verify']);
+Route::get('/request-verification/{user}', [AuthController::class, 'requestVerificationEmail']);
 Route::get('/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
 
 
