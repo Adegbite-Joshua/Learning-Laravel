@@ -65,6 +65,18 @@ class AuthController extends Controller
         ]);
     }
 
+    public function requestVerificationEmail(User $user) {
+        if (!$user) {
+            return $this->error(null, [
+                "message"=> "Invalid id"
+            ], 404);
+        }
+        $user->sendEmailVerificationNotification();
+
+        return $this->success([
+            "message"=> "Email verification sent successfully"
+        ]);
+    }
     public function login(LoginUserRequest $request)
     {
         $request->validated($request->all());
