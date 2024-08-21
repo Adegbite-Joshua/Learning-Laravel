@@ -20,7 +20,7 @@ class TaskController extends Controller
      use HttpResponses;
     public function index()
     {
-        return TasksResource::collection(Task::where('user_id', Auth::user()->id)->get());
+        return $this->success(TasksResource::collection(Task::where('user_id', Auth::user()->id)->get()), null, 200);
     }
 
     /**
